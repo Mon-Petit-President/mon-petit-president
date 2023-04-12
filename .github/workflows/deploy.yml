@@ -85,5 +85,5 @@ jobs:
           with:
             project_id: ${{ secrets.GCP_PROJECT_ID }}
             service: ${{ secrets.GCP_CLOUDRUN_SERVICE }}
-            image: ${{ env.IMAGE }}:${{ env.TAG }}
+            image: ${{ env.IMAGE }}:latest
             region: ${{ secrets.GCP_ZONE }}
