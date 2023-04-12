@@ -78,8 +78,7 @@ jobs:
         with:
           push: true
           tags: |
-             ${{ secrets.GCP_ZONE }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_PROJECT_ID }}/$IMAGE:$TAG
-             ${{ secrets.GCP_ZONE }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_PROJECT_ID }}/$IMAGE:latest
+             ${{ secrets.GCP_ZONE }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_PROJECT_ID }}:latest
 
 
       - name: Cleanup old images on Google Container Registry
