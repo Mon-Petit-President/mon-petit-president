@@ -70,21 +70,6 @@ jobs:
           tags: |
              ${{ secrets.GCP_ZONE }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_PROJECT_ID }}:latest
 
-
-      - name: Cleanup old images on Google Container Registry
-        run: |-
-          limitDate=$(date "+%Y-%m-%d %H:%M:%S" -d "60 days ago")
-
-          digests=$(gcloud container images list-tags $IMAGE \
-          --filter="timestamp.datetime < '$limitDate'" \
-          --format="get(digest)")
-
-          for digest in $digests; do
-          (
-            gcloud container images delete --quiet --force-delete-tags $IMAGE@$digest
-          )
-          done
-
   deploy-prod:
       name: Deploy to Prod
       runs-on: ubuntu-latest
