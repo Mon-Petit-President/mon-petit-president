@@ -71,11 +71,16 @@ jobs:
       - name: Build the Docker image
         run: |-
           docker build . --compress --tag $IMAGE:$TAG
+     
+      - id: docker-push-tagged
+        name: Tag Docker image and push to Google Artifact Registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+             ${{ secrets.GCP_ZONE }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_PROJECT_ID }}/$IMAGE:$TAG
+             ${{ secrets.GCP_ZONE }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_PROJECT_ID }}/$IMAGE:latest
 
-      - name: Push the Docker image to Google Container Registry
-        run: |-
-          docker push $IMAGE:$TAG
-          gcloud container images add-tag $IMAGE:$TAG $IMAGE:latest --quiet
 
       - name: Cleanup old images on Google Container Registry
         run: |-
