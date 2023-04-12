@@ -1,0 +1,124 @@
+# Requires secrets:
+#   GCP_HOST_GCR                  The base host of the Google Cloud Registry
+#   GCP_REGISTRY_PROJECT_ID       The GCP Project ID of the Google Cloud Registry
+#   GCP_SA_KEY_GCR_PUSHER         The GCP Service Account key used to push on the Google Cloud Registry
+#   GCP_GCR_REPOSITORY            The repository name of the app on the Google Cloud Registry
+#   GCP_SA_KEY_CLOUDRUN_DEPLOYER  The GCP Service Account key used to deploy services on Cloud Run
+#   GCP_PROJECT_ID                The GCP Project ID to deploy the app
+#   GCP_CLOUDRUN_SERVICE          The name of the Cloud Run service to deploy
+#   GCP_ZONE                      The region of the Cloud Run service
+
+on:
+  push:
+    branches: [ master ]
+
+env:
+  IMAGE: ${{ secrets.GCP_HOST_GCR }}/${{ secrets.GCP_REGISTRY_PROJECT_ID }}/${{ secrets.GCP_GCR_REPOSITORY }}
+  TAG: ${{ github.ref_name }}-${{ github.sha }}
+
+jobs:
+  test:
+    name: Test app
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          architecture: 'x64'
+
+      - name: Get Cache
+        uses: actions/cache@v3.0.10
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install wheel
+          pip install -r requirements.txt
+
+      - name: Run Security Checks
+        uses: reviewdog/action-bandit@v1.x
+        with:
+          path: "."
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
+
+      - name: Run Unit Tests
+        run: pytest tests/
+
+      - name: Pylint
+        run: |
+          pip install pylint
+          python -m pylint --fail-under=10 `find -regextype egrep -regex '(.*.py
+
+ docker-build-push-gcr:
+    name: Docker build & push on Google Cloud Registry
+    runs-on: ubuntu-latest
+    needs: [ test ]
+    if: github.event.ref == 'refs/heads/master' || github.event_name == 'release'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: google-github-actions/auth@v0.8.1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY_GCR_PUSHER }}
+          
+      - uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ secrets.GCP_REGISTRY_PROJECT_ID }}
+          export_default_credentials: true
+
+      - name: Configure Docker to use the gcloud command-line tool
+        run: |-
+          gcloud --quiet auth configure-docker
+
+      - name: Build the Docker image
+        run: |-
+          docker build . --compress --tag $IMAGE:$TAG
+
+      - name: Push the Docker image to Google Container Registry
+        run: |-
+          docker push $IMAGE:$TAG
+          gcloud container images add-tag $IMAGE:$TAG $IMAGE:latest --quiet
+
+      - name: Cleanup old images on Google Container Registry
+        run: |-
+          limitDate=$(date "+%Y-%m-%d %H:%M:%S" -d "60 days ago")
+
+          digests=$(gcloud container images list-tags $IMAGE \
+          --filter="timestamp.datetime < '$limitDate'" \
+          --format="get(digest)")
+
+          for digest in $digests; do
+          (
+            gcloud container images delete --quiet --force-delete-tags $IMAGE@$digest
+          )
+          done
+
+  deploy-prod:
+      name: Deploy to Prod
+      runs-on: ubuntu-latest
+      needs: [ docker-build-push-gcr ]
+      environment: production
+
+      steps:
+        - uses: google-github-actions/auth@v0.8.1
+          with:
+            credentials_json: ${{ secrets.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
+          
+        - uses: google-github-actions/deploy-cloudrun@main
+          with:
+            project_id: ${{ secrets.GCP_PROJECT_ID }}
+            service: ${{ secrets.GCP_CLOUDRUN_SERVICE }}
+            image: ${{ env.IMAGE }}:${{ env.TAG }}
+            region: ${{ secrets.GCP_ZONE }}
