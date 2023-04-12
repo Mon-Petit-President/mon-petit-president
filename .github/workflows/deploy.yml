@@ -50,7 +50,7 @@ jobs:
       - name: Pylint
         run: |
           pip install pylint
-          python -m pylint --fail-under=10 `find -regextype egrep -regex '(.*.py
+          python -m pylint --fail-under=10
 
   docker-build-push-gcr:
     name: Docker build & push on Google Cloud Registry
