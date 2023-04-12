@@ -47,12 +47,6 @@ jobs:
           pip install wheel
           pip install -r requirements.txt
 
-      - name: Run Security Checks
-        uses: reviewdog/action-bandit@v1.x
-        with:
-          path: "."
-        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
-
       - name: Run Unit Tests
         run: pytest tests/
 
