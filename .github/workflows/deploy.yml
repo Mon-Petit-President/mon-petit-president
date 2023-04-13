@@ -89,3 +89,5 @@ jobs:
             service: ${{ secrets.GCP_CLOUDRUN_SERVICE }}
             image: ${{ secrets.GCP_ZONE }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_PROJECT_ID }}:latest
             region: ${{ secrets.GCP_ZONE }}
+            env_vars: |
+              TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}
