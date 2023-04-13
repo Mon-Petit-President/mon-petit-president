@@ -11,4 +11,4 @@ app = ApplicationBuilder().token(getenv('TELEGRAM_TOKEN')).build()
 
 app.add_handler(CommandHandler("hello", hello))
 
-app.run_webhook(listen='0.0.0.0', port=8080)
+app.run_polling()
