@@ -39,7 +39,7 @@ def main() -> None:
     application.run_webhook(
         listen='0.0.0.0',
         port=8080,
-        secret_token=getenv('TELEGRAM_TOKEN'),
+        #secret_token=getenv('TELEGRAM_TOKEN'),
         webhook_url=getenv('WEBHOOK_URL')
     )
 
