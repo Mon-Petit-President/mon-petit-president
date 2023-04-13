@@ -1,17 +1,14 @@
-from flask import Flask, render_template
-import os
+from os import getenv
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-app = Flask(__name__)
+
+async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(f'Hello {update.effective_user.first_name}')
 
 
-@app.route('/')
-def index():
-    return 'Index Page de MPP'
+app = ApplicationBuilder().token(getenv('TELEGRAM_TOKEN')).build()
 
-@app.route('/hello')
-def hello():
-    return 'Hello MPP'
+app.add_handler(CommandHandler("hello", hello))
 
-if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 8080))
-    app.run(debug=True, host='0.0.0.0', port=port)
+app.run_polling()
