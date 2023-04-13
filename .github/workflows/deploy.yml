@@ -77,7 +77,9 @@ jobs:
       environment: production
 
       steps:
-        - uses: google-github-actions/auth@v0.8.1
+        - name: Google Auth
+          id: auth
+          uses: 'google-github-actions/auth@v0'
           with:
             credentials_json: ${{ secrets.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
 
@@ -85,5 +87,5 @@ jobs:
           with:
             project_id: ${{ secrets.GCP_PROJECT_ID }}
             service: ${{ secrets.GCP_CLOUDRUN_SERVICE }}
-            image: ${{ env.IMAGE }}:latest
+            image: ${{ secrets.GCP_ZONE }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_PROJECT_ID }}:latest
             region: ${{ secrets.GCP_ZONE }}
