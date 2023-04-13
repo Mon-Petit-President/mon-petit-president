@@ -1,1 +1,1 @@
-python-telegram-bot[all]
+python-telegram-bot==20.0a4
