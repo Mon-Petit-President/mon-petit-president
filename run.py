@@ -20,7 +20,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
-    await update.message.reply_text(update.message.text)
+    await update.message.reply_text("Ton ID est : "+str(update.effective_chat.id))
 
 
 def main() -> None:
