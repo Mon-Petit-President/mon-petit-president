@@ -36,7 +36,12 @@ def main() -> None:
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
     # Run the bot until the user presses Ctrl-C
-    application.run_polling()
+    application.run_webhook(
+        listen='0.0.0.0',
+        port=8080,
+        secret_token=getenv('TELEGRAM_TOKEN'),
+        webhook_url=getenv('WEBHOOK_URL')
+    )
 
 
 if __name__ == "__main__":

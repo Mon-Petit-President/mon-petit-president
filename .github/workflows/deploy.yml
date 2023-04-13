@@ -93,3 +93,4 @@ jobs:
             region: ${{ secrets.GCP_ZONE }}
             env_vars: |
               TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}
+              WEBHOOK_URL=${{ secrets.WEBHOOK_URL }}
