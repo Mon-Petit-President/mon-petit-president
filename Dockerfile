@@ -1,30 +1,19 @@
-# ---- Base python ----
-FROM python:3.11 AS base
-# Create app directory
+# start by pulling the python image
+FROM python:3.9
+
+# copy the requirements file into the image
+COPY ./requirements.txt /app/requirements.txt
+
+# switch working directory
 WORKDIR /app
 
-# ---- Dependencies ----
-FROM base AS dependencies
-COPY requirements.txt ./
-# install app dependencies
-RUN pip install --upgrade pip \
-    pip install -r requirements.txt
+# install the dependencies and packages in the requirements file
+RUN pip install -r requirements.txt
 
-# ---- Copy Files/Build ----
-FROM dependencies AS build
-WORKDIR /app
+# copy every content from the local file to the image
 COPY . /app
 
-# --- Release with Slim ----
-FROM python:3.11-slim AS release
-# Create app directory
-WORKDIR /app
+# configure the container to run in an executed manner
+ENTRYPOINT [ "python" ]
 
-COPY --from=dependencies /app/requirements.txt ./
-COPY --from=dependencies /root/.cache /root/.cache
-
-# Install app dependencies
-RUN pip install --upgrade pip \
-    pip install -r requirements.txt
-COPY --from=build /app/ ./
-CMD gunicorn --bind :$PORT --workers 4 --worker-class uvicorn.workers.UvicornWorker --threads 8 --timeout 0 main:app
+CMD ["main.py" ]
