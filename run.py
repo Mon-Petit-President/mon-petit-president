@@ -2,7 +2,6 @@ from os import getenv
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 from functools import wraps
-from telegram import ChatAction
 
 def admin_only(func):
     @wraps(func)
@@ -52,7 +51,6 @@ def main() -> None:
     application.run_webhook(
         listen='0.0.0.0',
         port=8080,
-        #secret_token=getenv('TELEGRAM_TOKEN'),
         webhook_url=getenv('WEBHOOK_URL')
     )
 
