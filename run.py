@@ -1,7 +1,20 @@
 from os import getenv
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+from functools import wraps
+from telegram import ChatAction
 
+def admin_only(func):
+    @wraps(func)
+    def wrapper(update, context, *args, **kwargs):
+        # Si l'utilisateur n'est pas un administrateur, envoyer un message d'erreur
+        if update.effective_user.id != getenv('TG_ADMIN'):
+            return
+        
+        # Si l'utilisateur est un administrateur, exécuter la fonction
+        return func(update, context, *args, **kwargs)
+    
+    return wrapper
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
@@ -17,7 +30,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     """Send a message when the command /help is issued."""
     await update.message.reply_text("Help!")
 
-
+@admin_only
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     await update.message.reply_text("Ton ID est : "+str(update.effective_chat.id))
