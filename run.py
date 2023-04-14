@@ -7,8 +7,8 @@ def admin_only(func):
     @wraps(func)
     def wrapper(update, context, *args, **kwargs):
         # Si l'utilisateur n'est pas un administrateur, envoyer un message d'erreur
-        if update.effective_user.id != getenv('TG_ADMIN'):
-            return update.message.reply_text(update.effective_user.id)
+        if int(update.effective_user.id) != int(getenv('TG_ADMIN')):
+            return update.message.reply_text(str(update.effective_user.id)+" : non admin")
         
         # Si l'utilisateur est un administrateur, exécuter la fonction
         return func(update, context, *args, **kwargs)
@@ -32,7 +32,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 @admin_only
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
-    await update.message.reply_text("Ton ID est : "+str(update.effective_chat.id))
+    await update.message.reply_text(str(update.effective_user.id)+" : bien admin")
 
 
 def main() -> None:
