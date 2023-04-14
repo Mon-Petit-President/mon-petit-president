@@ -8,7 +8,7 @@ def admin_only(func):
     def wrapper(update, context, *args, **kwargs):
         # Si l'utilisateur n'est pas un administrateur, envoyer un message d'erreur
         if update.effective_user.id != getenv('TG_ADMIN'):
-            return
+            return update.message.reply_text(update.effective_user.id)
         
         # Si l'utilisateur est un administrateur, exécuter la fonction
         return func(update, context, *args, **kwargs)
