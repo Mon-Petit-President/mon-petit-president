@@ -95,3 +95,11 @@ jobs:
               TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}
               WEBHOOK_URL=${{ secrets.WEBHOOK_URL }}
               TG_ADMIN = ${{ secrets.TG_ADMIN }}
+              MOBILE_APP_ID = ${{ secrets.MOBILE_APP_ID }}
+              MOBILE_BEARER_TOKEN = ${{ secrets.MOBILE_BEARER_TOKEN }}
+              BETS_TABLE_ID = ${{ secrets.BETS_TABLE_ID }}
+              BET_CHOICES_TABLE_ID = ${{ secrets.BET_CHOICES_TABLE_ID }}
+              USER_BET_CHOICE_ID = ${{ secrets.USER_BET_CHOICE_ID }}
+              USER_TABLE_ID = ${{ secrets.USER_TABLE_ID }}
+              ROOT_URL = ${{ secrets.ROOT_URL }}
+              NOTIF_URL = ${{ secrets.NOTIF_URL }}
